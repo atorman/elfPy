@@ -1,4 +1,4 @@
-## elf.py
+## A Simple Python Script for Downloading EventLogFiles
 
 ### Pre-requisites
 
