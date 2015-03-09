@@ -86,4 +86,4 @@ tweet to @atorman:
 
 or post a comment to Salesforcehacker.com
 
-* http://www.salesforcehacker.com# elfPy
+* http://www.salesforcehacker.com
