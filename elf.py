@@ -1,7 +1,7 @@
 # !/usr/bin/python
 '''
 # Python 2.7.9 script to download EventLogFiles
-# Pre-requisite: standard library functionality = urrlib2, json, StringIO
+# Pre-requisite: standard library functionality = e.g urrlib2, json, StringIO
 
  #/**
  #* Copyright (c) 2012, Salesforce.com, Inc.  All rights reserved.
@@ -40,16 +40,19 @@
 CLIENT_ID = '3MVG99OxTyEMCQ3ilfR5dFvVjgTrCbM3xX8HCLLS4GN72CCY6q86tRzvtjzY.0.p5UIoXHN1R4Go3SjVPs0mx'
 CLIENT_SECRET = '7899378653052916471'
 
-#Code
+#Imports
 
 import urllib2
 import json
-from StringIO import StringIO
-import ssl
+#import ssl
 import getpass
 import os
 import sys
+import gzip
+import time
+from StringIO import StringIO
 
+# login function
 def login():
     ''' Login to salesforce service using OAuth2 '''
     # prompt for username and password
@@ -69,8 +72,10 @@ def login():
     url = 'https://login.salesforce.com/services/oauth2/token'
     data = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password
     headers = {'X-PrettyPrint' : '1'}
-    if hasattr(ssl, '_create_unverified_context'):
-        ssl._create_default_https_context = ssl._create_unverified_context
+
+    # workaround to ssl issue introduced before version 2.7.9
+    #if hasattr(ssl, '_create_unverified_context'):
+        #ssl._create_default_https_context = ssl._create_unverified_context
 
     # call salesforce REST API and pass in OAuth credentials
     req = urllib2.Request(url, data, headers)
@@ -88,6 +93,7 @@ def login():
 
     return access_token, instance_url
 
+# download function
 def download_elf():
     ''' Query salesforce service using REST API '''
     # login and retrieve access_token and day
@@ -120,9 +126,12 @@ def download_elf():
     # create a directory for the output
     dir = raw_input("Output directory: ")
 
-    # check to see if anything was entered and if not, default values
+    # check to see if anything
     if len(dir) < 1:
-        dir = 'elf_downloads'
+        dir = 'elf'
+        print '\ndefault directory name used: ' + dir
+    else:
+        print '\ndirectory name used: ' + dir
 
     # If directory doesn't exist, create one
     if not os.path.exists(dir):
@@ -130,6 +139,17 @@ def download_elf():
 
     # close connection
     res.close
+
+    # check to see if the user wants to download it compressed
+    compress = raw_input('\nUse compression (y/n)\n').lower()
+    print compress
+   
+    # check to see if anything
+    if len(compress) < 1:
+        compress = 'yes'
+        print '\ndefault compression being used: ' + compress
+    else:
+        print '\ncompression being used: ' + compress
 
     # loop over json elements in result and download each file locally
     for i in range(total_size):
@@ -140,22 +160,64 @@ def download_elf():
 
         # create REST API request
         url = instance_url+'/services/data/v33.0/sobjects/EventLogFile/'+ids+'/LogFile'
-        headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
+
+        # provide correct compression header
+        if (compress == 'y') or (compress == 'yes'):
+            headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1', 'Accept-encoding' : 'gzip'}
+            print 'Using gzip compression\n'
+        else:
+            headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
+            print 'Not using gzip compression\n'
+
+        # begin profiling
+        start = time.time()
+
+        # open connection
         req = urllib2.Request(url, None, headers)
         res = urllib2.urlopen(req)
 
-        # provide feedback to user
-        print 'Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir
+        # end profiling
+        end = time.time()
+        secs = end - start
 
-        # buffer results and close connection
-        buffer = StringIO(res.read())
-        data = buffer.getvalue()
-        res.close()
+        print '********************************'
+
+        # provide feedback to user
+        print 'Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir + '\n'
+
+        # print the response to see the content type
+        print res.info()
+
+        #msecs = secs * 1000  # millisecs
+        #print 'elapsed time: %f ms' % msecs
+        print 'Total download time: %f seconds\n' % secs
+
+        # if the response is gzip-encoded as expected
+        # compression code from http://bit.ly/pyCompression
+        if res.info().get('Content-Encoding') == 'gzip':
+            # buffer results
+            buf = StringIO(res.read())
+            # gzip decode the response
+            f = gzip.GzipFile(fileobj=buf)
+            # print data
+            data = f.read()
+            # close buffer
+            buf.close()
+        else:
+            # buffer results
+            buf = StringIO(res.read())
+            # get the value from the buffer
+            data = buf.getvalue()
+            #print data
+            buf.close()
 
         # write buffer to CSV with following naming convention yyyy-mm-dd-eventtype.csv
         file = open(dir + '/' +dates[:10]+'-'+types+'.csv', 'w')
         file.write(data)
         file.close
         i = i + 1
+
+        # close connection
+        res.close
 
 download_elf()
