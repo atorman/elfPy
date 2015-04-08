@@ -208,7 +208,7 @@ def download_elf():
             buf = StringIO(res.read())
             # get the value from the buffer
             data = buf.getvalue()
-            #print data
+            # close buffer
             buf.close()
 
         # write buffer to CSV with following naming convention yyyy-mm-dd-eventtype.csv
