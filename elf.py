@@ -176,21 +176,13 @@ def download_elf():
         req = urllib2.Request(url, None, headers)
         res = urllib2.urlopen(req)
 
-        # end profiling
-        end = time.time()
-        secs = end - start
-
         print '********************************'
 
         # provide feedback to user
         print 'Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir + '\n'
 
         # print the response to see the content type
-        print res.info()
-
-        #msecs = secs * 1000  # millisecs
-        #print 'elapsed time: %f ms' % msecs
-        print 'Total download time: %f seconds\n' % secs
+        # print res.info()
 
         # if the response is gzip-encoded as expected
         # compression code from http://bit.ly/pyCompression
@@ -208,12 +200,21 @@ def download_elf():
             buf = StringIO(res.read())
             # get the value from the buffer
             data = buf.getvalue()
-            # close buffer
+            #print data
             buf.close()
 
         # write buffer to CSV with following naming convention yyyy-mm-dd-eventtype.csv
         file = open(dir + '/' +dates[:10]+'-'+types+'.csv', 'w')
         file.write(data)
+
+        # end profiling
+        end = time.time()
+        secs = end - start
+
+        #msecs = secs * 1000  # millisecs
+        #print 'elapsed time: %f ms' % msecs
+        print 'Total download time: %f seconds\n' % secs
+
         file.close
         i = i + 1
 
