@@ -1,4 +1,4 @@
-# !/usr/bin/python
+#!/usr/bin/python
 '''
 # Python 2.7.9 script to download EventLogFiles
 # Pre-requisite: standard library functionality = e.g urrlib2, json, StringIO
@@ -77,6 +77,18 @@ def login():
     #if hasattr(ssl, '_create_unverified_context'):
         #ssl._create_default_https_context = ssl._create_unverified_context
 
+    # These lines are for when you have a proxy server
+    # uncomment the next line to work with a local proxy server. replace the URL with the URL of your proxy
+    # proxy = urllib2.ProxyHandler({'https': 'http://127.0.0.1:8888/'})
+    # uncomment the next two lines if your proxy needs authentication. replace 'realm' through 'password' with appropriate values. 'realm' is often null
+    # proxy_auth_handler = urllib2.HTTPBasicAuthHandler()
+    # proxy_auth_handler.add_password('realm', 'host', 'username', 'password')
+    # pick one of the next two lines based on whether you need proxy authentication. The first is authenticated, the second is unauthenticated
+    # opener = urllib2.build_opener(proxy, proxy_auth_handler)
+    # opener = urllib2.build_opener(proxy)
+    # uncomment the final line to enable the proxy for any calls
+    # urllib2.install_opener(opener)
+
     # call salesforce REST API and pass in OAuth credentials
     req = urllib2.Request(url, data, headers)
     res = urllib2.urlopen(req)
@@ -143,7 +155,7 @@ def download_elf():
     # check to see if the user wants to download it compressed
     compress = raw_input('\nUse compression (y/n)\n').lower()
     print compress
-   
+
     # check to see if anything
     if len(compress) < 1:
         compress = 'yes'
