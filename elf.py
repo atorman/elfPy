@@ -35,10 +35,11 @@
  #* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #*/
 '''
-# Configurations - change to fit your org
+# Connected App information: fill it in by creating a connected app
+# https://help.salesforce.com/articleView?id=connected_app_create.htm&language=en_US&type=0
 
-CLIENT_ID = '3MVG99OxTyEMCQ3ilfR5dFvVjgTrCbM3xX8HCLLS4GN72CCY6q86tRzvtjzY.0.p5UIoXHN1R4Go3SjVPs0mx'
-CLIENT_SECRET = '7899378653052916471'
+CLIENT_ID = 'FILL_ME_IN'
+CLIENT_SECRET = 'FILL_ME_IN'
 
 #Imports
 
@@ -51,6 +52,7 @@ import sys
 import gzip
 import time
 from StringIO import StringIO
+import base64
 
 # login function
 def login():
@@ -68,6 +70,7 @@ def login():
     else:
         print 'Using user inputed username: ' + username
 
+    print 'check point'
     # create a new salesforce REST API OAuth request
     url = 'https://login.salesforce.com/services/oauth2/token'
     data = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password
