@@ -45,7 +45,7 @@ CLIENT_SECRET = 'FILL_ME_IN'
 
 import urllib2
 import json
-#import ssl
+import ssl
 import getpass
 import os
 import sys
@@ -53,6 +53,9 @@ import gzip
 import time
 from StringIO import StringIO
 import base64
+
+#create the ssl context
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 # login function
 def login():
@@ -94,7 +97,7 @@ def login():
 
     # call salesforce REST API and pass in OAuth credentials
     req = urllib2.Request(url, data, headers)
-    res = urllib2.urlopen(req)
+    res = urllib2.urlopen(req, context=ctx)
 
     # load results to dictionary
     res_dict = json.load(res)
