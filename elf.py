@@ -43,7 +43,7 @@ CLIENT_SECRET = 'FILL_ME_IN'
 
 #Imports
 
-import urllib2
+import urllib.request
 import json
 #import ssl
 import getpass
@@ -51,14 +51,14 @@ import os
 import sys
 import gzip
 import time
-from StringIO import StringIO
+from io import StringIO
 import base64
 
 # login function
 def login():
     ''' Login to salesforce service using OAuth2 '''
     # prompt for username and password
-    username = raw_input('Username: \n')
+    username = input('Username: \n')
     password = getpass.getpass('Password: \n')
 
     # check to see if anything was entered and if not, default values
@@ -66,14 +66,18 @@ def login():
     if len(username) < 1:
         username = 'user@company.com'
         password = 'Passw0rd'
-        print 'Using default username: ' + username
+        # print 'Using default username: ' + username #2.7.9
+        print('Using default username: {0}'.format(username))
     else:
-        print 'Using user inputed username: ' + username
+        # print 'Using user inputed username: ' + username #2.7.9
+        print('Using user inputed username: {0}'.format(username))
 
-    print 'check point'
+    # print 'check point' #2.7.9
+    print('check point')
     # create a new salesforce REST API OAuth request
     url = 'https://login.salesforce.com/services/oauth2/token'
-    data = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password
+    dataUnencoded = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password
+    data = urllib.parse.urlencode(dataUnencoded).encode("utf-8")
     headers = {'X-PrettyPrint' : '1'}
 
     # workaround to ssl issue introduced before version 2.7.9
@@ -93,8 +97,11 @@ def login():
     # urllib2.install_opener(opener)
 
     # call salesforce REST API and pass in OAuth credentials
-    req = urllib2.Request(url, data, headers)
-    res = urllib2.urlopen(req)
+    req = urllib.request.Request(url, data, headers)
+    try:
+        res = urllib.request.urlopen(req)
+    except urllib.error.URLError as e:
+        print('Error: {0}'.format(e.reason))
 
     # load results to dictionary
     res_dict = json.load(res)
@@ -114,20 +121,22 @@ def download_elf():
     # login and retrieve access_token and day
     access_token, instance_url = login()
 
-    day = raw_input('\nDate range (e.g. Last_n_Days:2, Today, Tomorrow):\n')
+    day = input('\nDate range (e.g. Last_n_Days:2, Today, Tomorrow):\n')
 
     # check to see if anything was entered and if not, default values
     if len(day) < 1:
         day = 'Last_n_Days:2'
-        print 'Using default date range: ' + day + '\n'
+        # print 'Using default date range: ' + day + '\n' #2.7.9
+        print('Using default date range: {0} \n'.format(day))
     else:
-        print 'Using user inputed date range: ' + day + '\n'
+        # print 'Using user inputed date range: ' + day + '\n' #2.7.9
+        print('Using user inputed date range: {0} \n'.format(day))
 
     # query Ids from Event Log File
     url = instance_url+'/services/data/v33.0/query?q=SELECT+Id+,+EventType+,+Logdate+From+EventLogFile+Where+LogDate+=+'+day
     headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
-    req = urllib2.Request(url, None, headers)
-    res = urllib2.urlopen(req)
+    req = urllib.request.Request(url, None, headers)
+    res = urllib.request.urlopen(req)
     res_dict = json.load(res)
 
     # capture record result size to loop over
@@ -135,18 +144,21 @@ def download_elf():
 
     # provide feedback if no records are returned
     if total_size < 1:
-        print 'No records were returned for ' + day
+        # print 'No records were returned for ' + day #2.7.9
+        print('No records were returned for {0}'.format(day))
         sys.exit()
 
     # create a directory for the output
-    dir = raw_input("Output directory: ")
+    dir = input("Output directory: ")
 
     # check to see if anything
     if len(dir) < 1:
         dir = 'elf'
-        print '\ndefault directory name used: ' + dir
+        # print '\ndefault directory name used: ' + dir #2.7.9
+        print('\ndefault directory name used: {0}'.format(dir))
     else:
-        print '\ndirectory name used: ' + dir
+        # print '\ndirectory name used: ' + dir #2.7.9
+        print('\ndirectory name used: {0}'.format(dir))
 
     # If directory doesn't exist, create one
     if not os.path.exists(dir):
@@ -156,15 +168,17 @@ def download_elf():
     res.close
 
     # check to see if the user wants to download it compressed
-    compress = raw_input('\nUse compression (y/n)\n').lower()
-    print compress
+    compress = input('\nUse compression (y/n)\n').lower()
+    print(compress)
 
     # check to see if anything
     if len(compress) < 1:
         compress = 'yes'
-        print '\ndefault compression being used: ' + compress
+        # print '\ndefault compression being used: ' + compress #2.7.9
+        print('\ndefault compression being used: {0}'.format(compress))
     else:
-        print '\ncompression being used: ' + compress
+        # print '\ncompression being used: ' + compress #2.7.9
+        print('\ncompression being used: {0}'.format(compress))
 
     # loop over json elements in result and download each file locally
     for i in range(total_size):
@@ -179,22 +193,26 @@ def download_elf():
         # provide correct compression header
         if (compress == 'y') or (compress == 'yes'):
             headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1', 'Accept-encoding' : 'gzip'}
-            print 'Using gzip compression\n'
+            # print 'Using gzip compression\n' #2.7.9
+            print('Using gzip compression\n')
         else:
             headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
-            print 'Not using gzip compression\n'
+            # print 'Not using gzip compression\n' #2.7.9
+            print('Not using gzip compression\n')
 
         # begin profiling
         start = time.time()
 
         # open connection
-        req = urllib2.Request(url, None, headers)
-        res = urllib2.urlopen(req)
+        req = urllib.request.Request(url, None, headers)
+        res = urllib.request.urlopen(req)
 
-        print '********************************'
+        # print '********************************' #2.7.9
+        print('********************************')
 
         # provide feedback to user
-        print 'Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir + '\n'
+        # print 'Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir + '\n' #2.7.9
+        print('Downloading: ' + dates[:10] + '-' + types + '.csv to ' + os.getcwd() + '/' + dir + '\n')
 
         # print the response to see the content type
         # print res.info()
@@ -228,7 +246,8 @@ def download_elf():
 
         #msecs = secs * 1000  # millisecs
         #print 'elapsed time: %f ms' % msecs
-        print 'Total download time: %f seconds\n' % secs
+        # print 'Total download time: %f seconds\n' % secs #2.7.9
+        print('Total download time: %f seconds\n' % secs)
 
         file.close
         i = i + 1
