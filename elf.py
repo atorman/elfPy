@@ -38,8 +38,8 @@
 # Connected App information: fill it in by creating a connected app
 # https://help.salesforce.com/articleView?id=connected_app_create.htm&language=en_US&type=0
 
-CLIENT_ID = 'FILL_ME_IN'
-CLIENT_SECRET = 'FILL_ME_IN'
+CLIENT_ID = '3MVG9CEn_O3jvv0xxArwB5GMmzT8s9RSd5RVX6OGYAzQouo9ON.xBk4agjNLoUUUhVbn2SqiTCxWfRJ5_8Hc_'
+CLIENT_SECRET = '73446011160915447'
 
 #Imports
 
@@ -76,7 +76,8 @@ def login():
     print('check point')
     # create a new salesforce REST API OAuth request
     url = 'https://login.salesforce.com/services/oauth2/token'
-    dataUnencoded = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password
+    # dataUnencoded = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password #2.7.9
+    dataUnencoded = {'grant_type': 'password', 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'username': username, 'password': password}
     data = urllib.parse.urlencode(dataUnencoded).encode("utf-8")
     headers = {'X-PrettyPrint' : '1'}
 
@@ -133,7 +134,7 @@ def download_elf():
         print('Using user inputed date range: {0} \n'.format(day))
 
     # query Ids from Event Log File
-    url = instance_url+'/services/data/v33.0/query?q=SELECT+Id+,+EventType+,+Logdate+From+EventLogFile+Where+LogDate+=+'+day
+    url = instance_url+'/services/data/v41.0/query?q=SELECT+Id+,+EventType+,+Logdate+From+EventLogFile+Where+LogDate+=+'+day
     headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
     req = urllib.request.Request(url, None, headers)
     res = urllib.request.urlopen(req)
@@ -188,7 +189,7 @@ def download_elf():
         dates = res_dict['records'][i]['LogDate']
 
         # create REST API request
-        url = instance_url+'/services/data/v33.0/sobjects/EventLogFile/'+ids+'/LogFile'
+        url = instance_url+'/services/data/v41.0/sobjects/EventLogFile/'+ids+'/LogFile'
 
         # provide correct compression header
         if (compress == 'y') or (compress == 'yes'):
