@@ -38,8 +38,6 @@
 # Connected App information: fill it in by creating a connected app
 # https://help.salesforce.com/articleView?id=connected_app_create.htm&language=en_US&type=0
 
-CLIENT_ID = '3MVG9CEn_O3jvv0xxArwB5GMmgutvtGbnMfsFiwiO75Xu8S0FL.5RTLHugnunoufsaww68QllkJopbffv.y1'
-CLIENT_SECRET = '59596969495969775440'
 
 #Imports
 
@@ -61,17 +59,21 @@ def login():
     # prompt for username and password
     username = input('Username: \n')
     password = getpass.getpass('Password: \n')
+    clientId = input('Consumer key: \n')
+    clientSecret = input('Consumer secret: \n')
 
     # check to see if anything was entered and if not, default values
     # change default values for username and password to your own
     if len(username) < 1:
-        username = 'mail@test.com'
+        username = 'your@email.com'
         password = 'PasswordToken'
+        clientId = 'YourConsumerKey'
+        clientSecret = 'YourConsumerSecret'
         # print 'Using default username: ' + username #2.7.9
-        print('Using default username: {0}'.format(username))
+        print('Using default username and credentials: {0}'.format(username))
     else:
         # print 'Using user inputed username: ' + username #2.7.9
-        print('Using user inputed username: {0}'.format(username))
+        print('Using user inputed username and credentials: {0}'.format(username))
 
     # print 'check point' #2.7.9
     print('check point')
@@ -80,9 +82,9 @@ def login():
     # dataUnencoded = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password #2.7.9
     dataUnencoded = {
         'grant_type': 'password',
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'redirect_uri': 'https://localhost/',
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'redirect_uri': 'YourRedirectURI',
         'username': username,
         'password': password
         }
@@ -230,7 +232,7 @@ def download_elf():
         # compression code from http://bit.ly/pyCompression
         if res.info().get('Content-Encoding') == 'gzip':
             # buffer results
-            buf = StringIO(res.read())
+            buf = StringIO(res.read().decode('utf-8'))
             # gzip decode the response
             f = gzip.GzipFile(fileobj=buf)
             # print data
@@ -239,7 +241,7 @@ def download_elf():
             buf.close()
         else:
             # buffer results
-            buf = StringIO(res.read())
+            buf = StringIO(res.read().decode('utf-8'))
             # get the value from the buffer
             data = buf.getvalue()
             #print data
