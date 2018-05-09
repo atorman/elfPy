@@ -38,12 +38,13 @@
 # Connected App information: fill it in by creating a connected app
 # https://help.salesforce.com/articleView?id=connected_app_create.htm&language=en_US&type=0
 
-CLIENT_ID = '3MVG9CEn_O3jvv0xxArwB5GMmzT8s9RSd5RVX6OGYAzQouo9ON.xBk4agjNLoUUUhVbn2SqiTCxWfRJ5_8Hc_'
-CLIENT_SECRET = '73446011160915447'
+CLIENT_ID = '3MVG9CEn_O3jvv0xxArwB5GMmgutvtGbnMfsFiwiO75Xu8S0FL.5RTLHugnunoufsaww68QllkJopbffv.y1'
+CLIENT_SECRET = '59596969495969775440'
 
 #Imports
 
 import urllib.request
+import requests
 import json
 #import ssl
 import getpass
@@ -64,8 +65,8 @@ def login():
     # check to see if anything was entered and if not, default values
     # change default values for username and password to your own
     if len(username) < 1:
-        username = 'user@company.com'
-        password = 'Passw0rd'
+        username = 'mail@test.com'
+        password = 'PasswordToken'
         # print 'Using default username: ' + username #2.7.9
         print('Using default username: {0}'.format(username))
     else:
@@ -77,7 +78,14 @@ def login():
     # create a new salesforce REST API OAuth request
     url = 'https://login.salesforce.com/services/oauth2/token'
     # dataUnencoded = '&grant_type=password&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&username='+username+'&password='+password #2.7.9
-    dataUnencoded = {'grant_type': 'password', 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'username': username, 'password': password}
+    dataUnencoded = {
+        'grant_type': 'password',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'redirect_uri': 'https://localhost/',
+        'username': username,
+        'password': password
+        }
     data = urllib.parse.urlencode(dataUnencoded).encode("utf-8")
     headers = {'X-PrettyPrint' : '1'}
 
@@ -99,10 +107,10 @@ def login():
 
     # call salesforce REST API and pass in OAuth credentials
     req = urllib.request.Request(url, data, headers)
-    try:
-        res = urllib.request.urlopen(req)
-    except urllib.error.URLError as e:
-        print('Error: {0}'.format(e.reason))
+    # try:
+    res = urllib.request.urlopen(req)
+    # except urllib.error.URLError as e:
+        # print('Error: {0}'.format(e.reason))
 
     # load results to dictionary
     res_dict = json.load(res)
