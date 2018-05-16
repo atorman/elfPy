@@ -25,20 +25,22 @@ def login():
     print('Remember, you need data from a Connected App')
     username = input('Username: ')
     # while len(password) < 1:
-    password = getpass.getpass('Password:')
+    password = getpass.getpass('Password and Token:')
     # while len(clientId) < 1:
     clientId = input('Consumer key: ')
     # while len(clientSecret) < 1:
     clientSecret = input('Consumer secret: ')
     instanceType = input('Instance type (login by default): ')
+    redirectURI = input('Redirect URI (from your App Connected, "http://localhost:4200/" by default): ')
 
     # check to see if anything was entered and if not, default values
     # change default values for username and password to your own
     if len(username) < 1:
-        username = 'you@mail.com'
+        username = 'your@email.com'
         password = 'PasswordToken'
-        clientId = 'Yourclientid'
-        clientSecret = 'Yourclientsecret'
+        clientId = 'YourConsumerKey'
+        clientSecret = 'YourClientSecret'
+        redirectURI = 'http://localhost:4200/'
         print('Using default username and credentials: {0}'.format(username))
     else:
         print('Using user inputed username and credentials: {0}'.format(username))
@@ -53,7 +55,7 @@ def login():
         'grant_type': 'password',
         'client_id': clientId,
         'client_secret': clientSecret,
-        'redirect_uri': 'YourRedirectURI',
+        'redirect_uri': redirectURI,
         'username': username,
         'password': password
         }
@@ -63,6 +65,8 @@ def login():
     req = urllib.request.Request(url, data, headers = headers)
     try:
         res = urllib.request.urlopen(req)
+        res_dict = json.load(res)
+        res.close()
     except urllib.error.URLError as e:
         if(e.reason == 'Bad Request'):
             print('Error: {0}, check input data'.format(e.reason))
