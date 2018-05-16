@@ -5,6 +5,7 @@
 #Imports
 import urllib.request
 import json
+import ssl
 import getpass
 import os
 import sys
@@ -64,7 +65,8 @@ def login():
     # call salesforce REST API and pass in OAuth credentials
     req = urllib.request.Request(url, data, headers = headers)
     try:
-        res = urllib.request.urlopen(req)
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+        res = urllib.request.urlopen(req, context = ctx)
         res_dict = json.load(res)
         res.close()
     except urllib.error.URLError as e:
