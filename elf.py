@@ -22,6 +22,7 @@ def login():
     # clientSecret = ''
     # prompt for username, password, consumer key and consumer secret
     # while len(username) < 1:
+    print('Remember, you need data from a Connected App')
     username = input('Username: ')
     # while len(password) < 1:
     password = getpass.getpass('Password:')
@@ -29,6 +30,7 @@ def login():
     clientId = input('Consumer key: ')
     # while len(clientSecret) < 1:
     clientSecret = input('Consumer secret: ')
+    instanceType = input('Instance type (login by default): ')
 
     # check to see if anything was entered and if not, default values
     # change default values for username and password to your own
@@ -40,10 +42,13 @@ def login():
         print('Using default username and credentials: {0}'.format(username))
     else:
         print('Using user inputed username and credentials: {0}'.format(username))
+    # Use 'login' by default
+    if len(instanceType) < 1:
+        instanceType = 'login'
 
     print('check point')
     # create a new salesforce REST API OAuth request
-    url = 'https://login.salesforce.com/services/oauth2/token'
+    url = 'https://' + instanceType + '.salesforce.com/services/oauth2/token'
     dataUnencoded = {
         'grant_type': 'password',
         'client_id': clientId,
@@ -56,16 +61,14 @@ def login():
     headers = {'X-PrettyPrint' : '1'}
     # call salesforce REST API and pass in OAuth credentials
     req = urllib.request.Request(url, data, headers = headers)
-    # try:
-    res = urllib.request.urlopen(req)
-    # except urllib.error.URLError as e:
-        # print('Error: {0}'.format(e.reason))
-
-    # load results to dictionary
-    res_dict = json.load(res)
-
-    # close connection
-    res.close()
+    try:
+        res = urllib.request.urlopen(req)
+    except urllib.error.URLError as e:
+        if(e.reason == 'Bad Request'):
+            print('Error: {0}, check input data'.format(e.reason))
+        else:
+            print('Error: {0}'.format(e.reason))
+        sys.exit()
 
     # return OAuth access token necessary for additional REST API calls
     access_token = res_dict['access_token']
