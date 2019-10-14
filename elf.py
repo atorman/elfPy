@@ -1,10 +1,10 @@
 #!/usr/bin/python
 '''
-# Python 2.7.9 script to download EventLogFiles
-# Pre-requisite: standard library functionality = e.g urrlib2, json, StringIO
+# Python 3.x script to download EventLogFiles
+# Pre-requisite: standard library functionality = e.g urllib, json
 
  #/**
- #* Copyright (c) 2012, Salesforce.com, Inc.  All rights reserved.
+ #* Copyright (c) 2019, Salesforce.com, Inc.  All rights reserved.
  #*
  #* Redistribution and use in source and binary forms, with or without
  #* modification, are permitted provided that the following conditions are
