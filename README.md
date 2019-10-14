@@ -4,27 +4,28 @@
 
 Elf.py is built on the Python Standard Library. Your script will automatically import the following modules:
 
-* import urllib2
+* import urllib.request
 * import json
-* from StringIO import StringIO
-* import ssl
 * import getpass
 * import os
 * import sys
+* import gzip
+* import time
+* from io import BytesIO
 
-As a result, there shouldn't be a need to install any other modules. However, you should verify that you have version 2.7.9 of python. Open a terminal (or cmd in Windows) and type:
+As a result, there shouldn't be a need to install any other modules. However, you should verify that you have version 3.x of python. Open a terminal (or cmd in Windows) and type:
 
       $ python --version
 
 You should see
 
-      Python 2.7.9
+      Python 3.x
 
-If you do not, you may need to install it: https://www.python.org/downloads/release/python-279/
+If you do not, you may need to install it: https://www.python.org/downloads/
 
 If you have multiple versions of python installed, you can declare which version you want on the command line:
 
-      $ python2.7 --version
+      $ python --version
 
 For more information, read the help topic (https://docs.python.org/3/installing/#work-with-multiple-versions-of-python-installed-in-parallel).
 
@@ -36,7 +37,7 @@ To use this script, just click the Download ZIP button in GitHub and store local
 
 From the terminal, navigate to the directory where you downloaded elf.py. For instance
 
-      $ cd ~/Users/atorman/Desktop
+      $ cd ~/Users/<User>/Desktop
 
 To run the script, type:
 
@@ -52,7 +53,7 @@ It's possible to change the defaults for these four prompts within the code. I r
 
 The output will be an Event Log File CSV (Comma Separated Values) file for each day in the date range with the following file name convention: yyyy-mm-dd-eventtype.csv. For instance:
 
-      2015-03-08-Login.csv
+      2019-10-08-Login.csv
 
 ### Troubleshooting
 
