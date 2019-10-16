@@ -13,13 +13,13 @@ Elf.py is built on the Python Standard Library. Your script will automatically i
 * import time
 * from io import BytesIO
 
-As a result, there shouldn't be a need to install any other modules. However, you should verify that you have version 3.x of python. Open a terminal (or cmd in Windows) and type:
+As a result, there shouldn't be a need to install any other modules. However, you should verify that you have python. Open a terminal (or cmd in Windows) and type:
 
       $ python --version
 
 You should see
 
-      Python 3.x
+      Python 3.x or 2.x. If you have 2.x use elf2.py or upgrade.
 
 If you do not, you may need to install it: https://www.python.org/downloads/
 
@@ -41,7 +41,7 @@ From the terminal, navigate to the directory where you downloaded elf.py. For in
 
 To run the script, type:
 
-      $ python elf.py
+      $ python elf.py (or python elf2.py for old python version)
 
 You will be prompted for several inputs:
 1. Username

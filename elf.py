@@ -42,6 +42,8 @@ CLIENT_ID = 'FILL_ME_IN'
 CLIENT_SECRET = 'FILL_ME_IN'
 ##########################################################################################
 
+API_VERSION = 'v47.0';
+
 #Imports
 import urllib.request
 import json
@@ -118,7 +120,7 @@ def download_elf():
         print('Using user inputed date range: ' + day + '\n') 
 
     # query Ids from Event Log File
-    url = instance_url+'/services/data/v47.0/query?q=SELECT+Id+,+EventType+,+Logdate+From+EventLogFile+Where+LogDate+=+'+day
+    url = instance_url+'/services/data/' + API_VERSION + '/query?q=SELECT+Id+,+EventType+,+Logdate+From+EventLogFile+Where+LogDate+=+'+day
     headers = {'Authorization' : 'Bearer ' + access_token, 'X-PrettyPrint' : '1'}
     req = urllib.request.Request(url, None, headers)
     res = urllib.request.urlopen(req)
@@ -168,7 +170,7 @@ def download_elf():
         dates = res_dict['records'][i]['LogDate']
 
         # create REST API request
-        url = instance_url+'/services/data/v47.0/sobjects/EventLogFile/'+ids+'/LogFile'
+        url = instance_url+'/services/data/' + API_VERSION + '/sobjects/EventLogFile/'+ids+'/LogFile'
 
         # provide correct compression header
         if (compress == 'y') or (compress == 'yes'):
