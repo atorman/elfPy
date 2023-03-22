@@ -47,12 +47,16 @@ API_VERSION = 'v47.0';
 #Imports
 import urllib.request
 import json
+import ssl
 import getpass
 import os
 import sys
 import gzip
 import time
 from io import BytesIO
+
+#create the ssl context
+ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 # login function
 def login():
@@ -90,7 +94,7 @@ def login():
     # call salesforce REST API and pass in OAuth credentials
     encoded_data = urllib.parse.urlencode(data).encode("utf-8")
     req = urllib.request.Request(url, encoded_data, headers)
-    res = urllib.request.urlopen(req)
+    res = urllib.request.urlopen(req, context=ctx)
 
     # load results to dictionary
     res_dict = json.load(res)
